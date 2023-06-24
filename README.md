@@ -42,3 +42,30 @@
 이미 정렬된 자료를 정렬하는 이유는 정렬 알고리즘은 자료가 정렬되어 있는지 아닌지는 모르고 작동하기 때문에 의미가 있다.  
 가장 손쉽게 구현하여 사용할 수 있지만, 만들기가 쉽고 직관적일 뿐이지 알고리즘적 관점에서 보면 대단히 비효율적인 정렬 방식이다.  
 다른 몇 가지 정렬 방식과 비교해도 효율이 극히 안 좋다.
+
+## 구현
+```c#
+using System;
+using System.Collections;
+
+public class BubbleSortClass
+{
+  public static void BubbleSort(int[] arr)
+  {
+    int i, j, temp;
+    int len = arr.Length;
+    for (i = 0; i < len - 1; i++)
+    {
+      for (j = 0; j < len - i - 1; j++)
+      {
+        if (arr[j] > arr[j + 1])
+        {
+          temp = arr[j];
+          arr[j] = arr[j + 1];
+          arr[j + 1] = temp;
+        }
+      }
+    }
+  }
+}
+```
