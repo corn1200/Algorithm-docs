@@ -45,6 +45,36 @@
 
 ## 구현
 ```c#
+public static void BubbleSort(int[] arr)
+{
+  int i, j, temp;
+  int len = arr.Length;
+
+  for (i = 0; i < len - 1; i++)
+  {
+    for (j = 0; j < len - i - 1; j++)
+    {
+      if (arr[j] > arr[j + 1])
+      {
+        temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+      }
+    }
+  }
+}
+```
+버블 정렬을 실행하는 함수를 작성한다.   
+파라미터로 정렬할 배열을 전달 받는다.  
+차례대로 첫번째 요소부터 마지막 요소까지 비교하면서 현재 요소보다 다음 요소가 작을 경우 위치를 바꾼다.  
+한번 비교를 마치면 가장 큰 값이 마지막에 위치하게 된다.   
+마지막 요소는 또 비교할 필요가 없기 때문에 비교하는 범위를 줄여서 다시 차례대로 비교하고 위치를 바꾼다.
+
+[파일](/sample_code/AVLTree.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -77,3 +107,4 @@ public class BubbleSortClass
   }
 }
 ```
+</details>
