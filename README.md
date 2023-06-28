@@ -117,9 +117,11 @@ k번째 원소를 1부터 k-1까지와 비교해 적절한 위치에 끼워넣�
 using System;
 using System.Collections;
 
-public class MergeSort
+public static class MergeSort
 {
-  private static void Merge(int[] arr, int left, int middle, int right)
+  private static int[] Array { get; set; }
+
+  private static void Merge(int left, int middle, int right)
   {
     int n1 = middle - left + 1;
     int n2 = right - middle;
@@ -129,11 +131,11 @@ public class MergeSort
 
     for (int i = 0; i < n1; i++)
     {
-      L[i] = arr[left + i];
+      L[i] = Array[left + i];
     }
     for (int j = 0; j < n2; j++)
     {
-      R[j] = arr[middle + 1 + j];
+      R[j] = Array[middle + 1 + j];
     }
 
     int x = 0, y = 0;
@@ -142,12 +144,12 @@ public class MergeSort
     {
       if (L[x] <= R[y])
       {
-        arr[k] = L[x];
+        Array[k] = L[x];
         x++;
       }
       else
       {
-        arr[k] = R[y];
+        Array[k] = R[y];
         y++;
       }
       k++;
@@ -155,14 +157,14 @@ public class MergeSort
 
     while (x < n1)
     {
-      arr[k] = L[x];
+      Array[k] = L[x];
       x++;
       k++;
     }
 
     while (y < n2)
     {
-      arr[k] = R[y];
+      Array[k] = R[y];
       y++;
       k++;
     }
@@ -177,7 +179,7 @@ public class MergeSort
       SortRecursive(left, middle);
       SortRecursive(middle + 1, right);
 
-      Merge(arr, left, middle, right);
+      Merge(left, middle, right);
     }
   }
 
