@@ -52,16 +52,22 @@ public class MergeSort
     }
   }
 
-  public static void Sort(int[] arr, int left, int right)
+  private static void SortRecursive(int left, int right)
   {
     if (left < right)
     {
       int middle = (left + right) / 2;
 
-      Sort(arr, left, middle);
-      Sort(arr, middle + 1, right);
+      SortRecursive(left, middle);
+      SortRecursive(middle + 1, right);
 
       Merge(arr, left, middle, right);
     }
+  }
+
+  public static void Sort(int[] arr)
+  {
+    Array = arr;
+    SortRecursive(0, arr.Length - 1);
   }
 }
