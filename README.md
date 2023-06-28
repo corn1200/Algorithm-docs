@@ -111,3 +111,74 @@ k번째 원소를 1부터 k-1까지와 비교해 적절한 위치에 끼워넣�
 
 이 그림에서 분할 정복으로 일정하게 정렬이 이뤄지는 병합 정렬의 특징을 잘 파악할 수 있다.  
 [38, 27, 43, 3, 9, 82, 10] 인 입력값은 [38, 27, 43, 3] 과 [9, 82, 10] 두 부분으로 분할, 다시 [38, 27], [43, 3], [9, 82], [10] 네 부분으로 분할하는 동작을 반복하여 더 이상 쪼갤 수 없을 때까지 계속해서 분할한 후, 분할이 끝나면 정렬하면서 정복해 나간다.
+
+## 구현
+```c#
+using System;
+using System.Collections;
+
+public class MergeSort
+{
+  private static void Merge(int[] arr, int left, int middle, int right)
+  {
+    int n1 = middle - left + 1;
+    int n2 = right - middle;
+
+    int[] L = new int[n1];
+    int[] R = new int[n2];
+
+    for (int i = 0; i < n1; i++)
+    {
+      L[i] = arr[left + i];
+    }
+    for (int j = 0; j < n2; j++)
+    {
+      R[j] = arr[middle + 1 + j];
+    }
+
+    int x = 0, y = 0;
+    int k = left;
+    while (x < n1 && y < n2)
+    {
+      if (L[x] <= R[y])
+      {
+        arr[k] = L[x];
+        x++;
+      }
+      else
+      {
+        arr[k] = R[y];
+        y++;
+      }
+      k++;
+    }
+
+    while (x < n1)
+    {
+      arr[k] = L[x];
+      x++;
+      k++;
+    }
+
+    while (y < n2)
+    {
+      arr[k] = R[y];
+      y++;
+      k++;
+    }
+  }
+
+  public static void Sort(int[] arr, int left, int right)
+  {
+    if (left < right)
+    {
+      int middle = (left + right) / 2;
+
+      Sort(arr, left, middle);
+      Sort(arr, middle + 1, right);
+
+      Merge(arr, left, middle, right);
+    }
+  }
+}
+```
