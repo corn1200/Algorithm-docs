@@ -31,6 +31,7 @@
 
 # 1.1.1. 버블 정렬
 ![버블 정렬](/img/bubble_sort0.gif)
+
 버블 정렬의 실행 과정을 표현한 그림.
 
 1번째와 2번째 원소를 비교하여 정렬하고, 2번째와 3번째, ..., n-1번째와 n번째를 정렬한 뒤 다시 처음으로 돌아가 이번에는 n-2번째와 n-1번째까지, ...해서 최대 n(n - 1) / 2 번 정렬한다. (이것은 최악의 경우이다. 최선의 경우(이미 정렬된 경우)는 0번)   
@@ -44,6 +45,7 @@
 
 # 1.1.2. 칵테일 정렬
 ![칵테일 정렬](/img/cocktail_sort0.gif)
+
 칵테일 정렬의 실행 과정을 표현한 그림.
 
 셰이커 정렬(shaker sort)라고도 한다.  
@@ -57,6 +59,7 @@
 
 # 1.1.4. 선택 정렬
 ![선택 정렬](/img/selection_sort0.gif)
+
 선택 정렬의 실행 과정을 표현한 그림.
 
 버블 정렬이 비교하고 바로 바꿔 넣는 걸 반복한다면 이쪽은 일단 1번째부터 끝까지 훑어서 가장 작은 게 1번째, 2번째부터 끝까지 훑어서 가장 작은 게 2번째...해서 (n-1)번 반복한다.   
@@ -71,6 +74,7 @@
 
 # 1.1.5. 삽입 정렬
 ![삽입 정렬](/img/insertion_sort0.gif)
+
 삽입 정렬의 실행 과정을 표현한 그림.
 
 k번째 원소를 1부터 k-1까지와 비교해 적절한 위치에 끼워넣고 그 뒤의 자료를 한 칸씩 뒤로 밀어내는 방식으로, 평균적으론 O(n^2)중 빠른 편이나(최악의 경우가 n(n - 1) / 2에 비례한다.) 자료구조에 따라선 뒤로 밀어내는데 걸리는 시간이 크며, 위의 그림처럼 작은 값이 뒤쪽에 몰려있으면(내림차순의 경우 큰 값이 뒤쪽에 몰려있으면) 굉장히 비효율적이다.   
@@ -92,6 +96,7 @@ k번째 원소를 1부터 k-1까지와 비교해 적절한 위치에 끼워넣�
 
 # 1.2.1. 병합 정렬
 ![병합 정렬](/img/merge_sort0.gif)
+
 병합 정렬의 실행 과정을 표현한 그림.
 
 개발자는 존 폰 노이만으로 원소 개수가 1 또는 0이 될 때까지 두 부분으로 쪼개기를 반복해서 자른 순서의 역순으로 크기를 비교해 병합해 나간다.  
@@ -107,6 +112,7 @@ k번째 원소를 1부터 k-1까지와 비교해 적절한 위치에 끼워넣�
 정렬되어 있는 두 배열을 합집합할 때 이 알고리즘의 마지막 단계만을 이용하면 가장 빠르게 정렬된 상태로 합칠 수 있다.
 
 그림으로 병합 정렬 과정을 도식화 하면 다음과 같다.
+
 ![병합 정렬 도식화](/img/merge_sort1.webp)
 
 이 그림에서 분할 정복으로 일정하게 정렬이 이뤄지는 병합 정렬의 특징을 잘 파악할 수 있다.  
@@ -119,74 +125,105 @@ using System.Collections;
 
 public static class MergeSort
 {
+  // 정렬할 배열
   private static int[] Array { get; set; }
 
+  // 정렬 함수
+  public static void Sort(int[] arr)
+  {
+    // 정렬할 배열 초기화
+    Array = arr;
+    // 첫 번째 분할 실행
+    Divide(0, arr.Length - 1);
+  }
+
+  // 분할 함수
+  private static void Divide(int left, int right)
+  {
+    // 왼쪽 인덱스가 오른쪽 인덱스 보다 작을 경우 실행
+    if (left < right)
+    {
+      // 왼쪽, 오른쪽의 중간 인덱스를 구함
+      int middle = (left + right) / 2;
+
+      // 왼쪽부터 중앙까지, 중앙부터 오른쪽 인덱스까지 분할
+      Divide(left, middle);
+      Divide(middle + 1, right);
+
+      // 현재 분할된 범위로 병합 실행
+      Merge(left, middle, right);
+    }
+  }
+
+  // 병합 함수
   private static void Merge(int left, int middle, int right)
   {
+    // 왼쪽부터 중앙까지 배열의 크기
     int n1 = middle - left + 1;
+    // 중앙부터 오른쪽까지 배열의 크기
     int n2 = right - middle;
 
+    // 분할된 왼쪽, 오른쪽 배열 선언
     int[] L = new int[n1];
     int[] R = new int[n2];
 
+    // 왼쪽 배열 복사
     for (int i = 0; i < n1; i++)
     {
       L[i] = Array[left + i];
     }
+    // 오른쪽 배열 복사
     for (int j = 0; j < n2; j++)
     {
       R[j] = Array[middle + 1 + j];
     }
 
+    // 왼쪽, 오른쪽 배열 배치 횟수
     int x = 0, y = 0;
+    // 시작 인덱스
     int k = left;
+
+    // 왼쪽, 오른쪽 배열 중 하나가 전부 배치할 때까지 반복
     while (x < n1 && y < n2)
     {
+      // 다음에 배치할 왼쪽 요소가 오른쪽 요소보다 작거나 같을 경우 실행
       if (L[x] <= R[y])
       {
+        // 시작 인덱스에 왼쪽 요소 저장
         Array[k] = L[x];
+        // 왼쪽 인덱스 증가
         x++;
       }
       else
       {
+        // 시작 인덱스에 오른쪽 요소 저장
         Array[k] = R[y];
+        // 오른쪽 인덱스 증가
         y++;
       }
+      // 시작 인덱스 증가
       k++;
     }
 
+    // 왼쪽 배열 요소 전부 배치할 때까지 반복
     while (x < n1)
     {
+      // 시작 인덱스에 왼쪽 요소 저장
       Array[k] = L[x];
+      // 왼쪽 인덱스, 시작 인덱스 증가
       x++;
       k++;
     }
 
+    // 오른쪽 배열 요소 전부 배치할 때까지 반복
     while (y < n2)
     {
+      // 시작 인덱스에 오른쪽 요소 저장
       Array[k] = R[y];
+      // 오른쪽 인덱스, 시작 인덱스 증가
       y++;
       k++;
     }
-  }
-
-  private static void SortRecursive(int left, int right)
-  {
-    if (left < right)
-    {
-      int middle = (left + right) / 2;
-
-      SortRecursive(left, middle);
-      SortRecursive(middle + 1, right);
-
-      Merge(left, middle, right);
-    }
-  }
-
-  public static void Sort(int[] arr)
-  {
-    Array = arr;
-    SortRecursive(0, arr.Length - 1);
   }
 }
 ```
