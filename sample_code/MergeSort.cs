@@ -6,7 +6,7 @@ public static class MergeSort
   // 정렬할 배열
   private static int[] Array { get; set; }
 
-  // 정렬 함수
+  // 정렬 메서드
   public static void Sort(int[] arr)
   {
     // 정렬할 배열 초기화
@@ -15,7 +15,7 @@ public static class MergeSort
     Divide(0, arr.Length - 1);
   }
 
-  // 분할 함수
+  // 분할 메서드
   private static void Divide(int left, int right)
   {
     // 왼쪽 인덱스가 오른쪽 인덱스 보다 작을 경우 실행
@@ -33,7 +33,7 @@ public static class MergeSort
     }
   }
 
-  // 병합 함수
+  // 병합 메서드
   private static void Merge(int left, int middle, int right)
   {
     // 왼쪽부터 중앙까지 배열의 크기
