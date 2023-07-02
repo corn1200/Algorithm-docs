@@ -250,6 +250,7 @@ private static void Merge(int left, int middle, int right)
 using System;
 using System.Collections;
 
+// 병합 정렬 클래스
 public static class MergeSort
 {
   // 정렬할 배열
@@ -378,17 +379,22 @@ public static class MergeSort
 using System;
 using System.Collections;
 
+// 힙 정렬 클래스
 public static class HeapSort
 {
+  // 정렬 메서드
   public static void Sort(int[] arr)
   {
+    // 최대 힙 객체 생성
     Heap<int> heap = new Heap<int>();
 
+    // 힙에 모든 배열 요소 추가
     foreach (int i in arr)
     {
       heap.Add(i);
     }
 
+    // 힙 데이터를 제거하며 배열에 저장
     for (int i = arr.Length - 1; i >= 0; i--)
     {
       arr[i] = heap.Remove();
@@ -396,7 +402,7 @@ public static class HeapSort
   }
 
   // 최대 힙 클래스
-  public class Heap<T>
+  private class Heap<T>
   {
     // 트리 데이터를 저장할 리스트, 비교자
     private List<T> Tree { get; set; }

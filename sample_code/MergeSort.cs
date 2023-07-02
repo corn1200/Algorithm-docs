@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 
+// 병합 정렬 클래스
 public static class MergeSort
 {
   // 정렬할 배열
