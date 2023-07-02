@@ -376,6 +376,44 @@ public static class MergeSort
 
 ### 구현
 ```c#
+public static class HeapSort
+{
+  private class Heap<T>
+  {
+    // ...
+  }
+  // ...
+}
+```
+힙 정렬 클래스와 내부적으로 사용할 [최대 힙 클래스](https://github.com/corn1200/Data-structure-docs#7-%ED%9E%99)를 작성한다.  
+
+```c#
+public static void Sort(int[] arr)
+{
+  Heap<int> heap = new Heap<int>();
+
+  foreach (int i in arr)
+  {
+    heap.Add(i);
+  }
+
+  for (int i = arr.Length - 1; i >= 0; i--)
+  {
+    arr[i] = heap.Remove();
+  }
+}
+```
+정렬 실행 메서드를 작성한다.  
+최대 힙 객체를 생성하고 정렬할 배열의 요소들을 힙에 추가한다.   
+최대 힙이기 때문에 요소를 추가하면서 루트 노드에 가장 큰 값이 위치하게 된다.   
+모든 배열 요소를 힙에 추가한 후, 힙의 모든 데이터를 배열에 역순으로 저장한다.   
+힙에서 데이터를 제거하면 루트 노드를 삭제 및 반환하며, 다시 가장 큰 값이 루트 노드에 위치하도록 위치를 변경한다.
+
+[파일](/sample_code/HeapSort.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -555,3 +593,4 @@ public static class HeapSort
   }
 }
 ```
+</details>
