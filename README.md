@@ -641,3 +641,56 @@ C, C++, PHP 등의 언어에서 제공하는 정렬 함수에서 퀵 정렬 혹�
 현존하는 컴퓨터 아키텍처상에서 비교 연산자를 이용하여 구현된 정렬 알고리즘 중 가장 고성능인 알고리즘이 바로 이 퀵 정렬이다.   
 단 데이터에 접근하는 시간이 오래 걸리는 외부 기억장소(하드디스크 등)에서 직접 정렬을 수행할 경우에는 병합 정렬이 더 빠른 것으로 알려져 있다.  
 요즘에는 디스크에서 데이터를 블럭 단위로 읽어서 각각을 퀵 정렬한 뒤 정렬된 두 블럭을 병합 정렬하는 식으로 알고리즘을 설계한다.
+
+### 구현
+```c#
+using System;
+using System.Collections;
+
+public static class QuickSort
+{
+  private static int[] Array { get; set; }
+
+  public static void Sort(int[] array)
+  {
+    Array = array;
+    Sort(0, array.Length - 1);
+  }
+
+  private static void Sort(int left, int right)
+  {
+    if (left < right)
+    {
+      int pivotIndex = Partition(left, right);
+
+      Sort(left, pivotIndex - 1);
+      Sort(pivotIndex + 1, right);
+    }
+  }
+
+  private static int Partition(int left, int right)
+  {
+    int pivot = Array[right];
+    int i = left - 1;
+
+    for (int j = left; j < right; j++)
+    {
+      if (Array[j] < pivot)
+      {
+        i++;
+        Swap(i, j);
+      }
+    }
+
+    Swap(i + 1, right);
+    return i + 1;
+  }
+
+  private static void Swap(int i, int j)
+  {
+    int temp = Array[i];
+    Array[i] = Array[j];
+    Array[j] = temp;
+  }
+}
+```
