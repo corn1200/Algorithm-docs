@@ -644,6 +644,70 @@ C, C++, PHP 등의 언어에서 제공하는 정렬 함수에서 퀵 정렬 혹�
 
 ### 구현
 ```c#
+public static class QuickSort
+{
+  private static int[] Array { get; set; }
+  // ...
+}
+```
+퀵 정렬 클래스를 작성한다.  
+정렬할 배열을 필드로 가진다.
+
+```c#
+public static void Sort(int[] array)
+{
+  Array = array;
+
+  Sort(0, array.Length - 1);
+}
+```
+외부 사용자가 호출하는 용도의 정렬 시작 메서드를 작성한다.  
+정렬할 배열을 초기화한다.   
+정렬 범위를 0번 인덱스부터 배열의 마지막 인덱스까지로 정한다.
+
+```c#
+private static void Sort(int left, int right)
+{
+  if (left < right)
+  {
+    int pivotIndex = Partition(left, right);
+
+    Sort(left, pivotIndex - 1);
+    Sort(pivotIndex + 1, right);
+  }
+}
+```
+내부 동작용 정렬 메서드를 작성한다.   
+정렬 범위(왼쪽, 오른쪽)가 유효한 경우에만 아래 동작을 실행한다.
+1. 왼쪽, 오른쪽 범위 내의 값들을 파티션 분할 및 정렬 동작 후 피벗이 이동한 위치를 반환한다.
+2. 왼쪽부터 피벗 전까지를 범위로 정렬 메서드를 실행한다.
+3. 피벗 이후부터 오른쪽까지를 범위로 정렬 메서드를 실행한다.
+
+```c#
+private static int Partition(int left, int right)
+{
+  int pivot = Array[right];
+  int i = left - 1;
+
+  for (int j = left; j < right; j++)
+  {
+    if (Array[j] < pivot)
+    {
+      i++;
+      Swap(i, j);
+    }
+  }
+
+  Swap(i + 1, right);
+  return i + 1;
+}
+```
+
+[파일](/sample_code/HeapSort.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -714,3 +778,4 @@ public static class QuickSort
   }
 }
 ```
+</details>
