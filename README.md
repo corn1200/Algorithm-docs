@@ -820,6 +820,52 @@ public static class QuickSort
 
 ### 구현
 ```c#
+public static class TreeSort
+{
+  private static int[] Array { get; set; }
+  private static int Index { get; set; }
+
+  private class Node
+  {
+    // ...
+  }
+
+  private class BinarySearchTree 
+  {
+    // ...
+  }
+}
+```
+트리 정렬 클래스를 작성한다.  
+정렬할 배열과 배열 인덱스를 필드로 가진다.  
+내부적으로 사용할 [이진 탐색 트리 클래스](https://github.com/corn1200/Data-structure-docs#611-%EC%9D%B4%EC%A7%84-%ED%83%90%EC%83%89-%ED%8A%B8%EB%A6%AC)를 작성한다.
+
+```c#
+public static void Sort(int[] arr)
+{
+  BinarySearchTree tree = new BinarySearchTree();
+
+  Array = arr;
+  Index = 0;
+
+  foreach (int item in Array)
+  {
+    tree.Add(item);
+  }
+
+  tree.InOrderTraversal();
+}
+```
+정렬 메서드를 작성한다.   
+이진 탐색 트리 객체를 선언하고 정렬할 배열과 인덱스를 초기화한다.   
+모든 배열 요소를 이진 탐색 트리에 삽입한 후 중위 순회 방식으로 트리에 삽입된 요소를 탐색하며 배열에 다시 저장한다.  
+왼쪽 - 자신 - 오른쪽 순서로 노드를 방문하기 때문에 정렬된 데이터를 얻을 수 있다.
+
+[파일](/sample_code/TreeSort.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -1089,3 +1135,4 @@ public static class TreeSort
   }
 }
 ```
+</details>
