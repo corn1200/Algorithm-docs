@@ -823,21 +823,30 @@ public static class QuickSort
 using System;
 using System.Collections;
 
+//트리 정렬 클래스
 public static class TreeSort
 {
+  // 정렬할 배열, 배열 인덱스
   private static int[] Array { get; set; }
   private static int Index { get; set; }
 
+  // 정렬 메서드
   public static void Sort(int[] arr)
   {
+    // 이진 탐색 트리 선언
     BinarySearchTree tree = new BinarySearchTree();
 
-    foreach (int item in arr)
+    // 배열, 인덱스 초기화
+    Array = arr;
+    Index = 0;
+
+    // 모든 배열 요소를 이진 탐색 트리에 삽입
+    foreach (int item in Array)
     {
       tree.Add(item);
     }
-    Array = arr;
-    Index = 0;
+
+    // 중위 순회 방식으로 배열에 요소 저장
     tree.InOrderTraversal();
   }
 
@@ -1032,7 +1041,7 @@ public static class TreeSort
       return getNode != null;
     }
 
-    // 중위 순회(In-order) 출력
+    // 중위 순회(In-order)
     public void InOrderTraversal()
     {
       // 노드 이동 경로를 저장할 스택
@@ -1061,8 +1070,11 @@ public static class TreeSort
 
         // 이동 경로 중 가장 최근 노드를 방문
         Node visit = stack.Pop();
+
+        // 배열에 저장 후 인덱스 증가
         Array[Index] = visit.Data;
         Index++;
+
         // 노드 집합에 방문한 노드 저장
         visited.Add(visit);
 
