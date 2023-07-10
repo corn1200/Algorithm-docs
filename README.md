@@ -1292,6 +1292,8 @@ Depth-Limited Search와 같이 특정 깊이까지 DFS 방법으로 답을 구�
 물론 탐색했던 곳을 제한 깊이가 늘어날때마다 반복적으로 탐색하므로 시간은 비교적 오래 걸리지만, 일반적으로 컴퓨터의 연산 속도는 사람에 비해서 매우 빠르기 때문에 이는 크게 신경쓸 필요가 없다.
 
 # 2.1.1. DFS
+![DFS](/img/DFS_BFS.gif)
+
 DFS(깊이 우선 탐색, Depth-First Search)는 그래프의 모든 노드를 탐색하는 알고리즘 중 하나이다.   
 DFS는 스택(Stack) 또는 재귀 함수를 사용하여 구현할 수 있다.
 
@@ -1331,7 +1333,42 @@ DFS는 그래프의 모든 노드를 방문하는데 사용될 수 있다.
 
 DFS는 간단하고 직관적인 알고리즘으로 경로 찾기 문제에 유용하게 사용될 수 있지만, 그래프의 특성과 문제의 요구에 따라 적합한 탐색 알고리즘을 선택해야 한다.
 
+### 구현
+```c#
+using System;
+using System.Collections;
+
+public static class DFS<T>
+{
+  private static List<Node<T>> Visisted { get; set; }
+
+  private static void SearchUtil(Node<T> node)
+  {
+    Visisted.Add(node);
+
+    Console.Write(node.Data + " ");
+
+    foreach (Node<T> item in node.Neighbors)
+    {
+      if (!Visisted.Contains(item))
+      {
+        SearchUtil(item);
+      }
+    }
+  }
+
+  public static void Search(Node<T> start)
+  {
+    Visisted = new List<Node<T>>();
+
+    SearchUtil(start);
+  }
+}
+```
+
 # 2.1.2. BFS
+![BFS](/img/DFS_BFS.gif)
+
 BFS(너비 우선 탐색, Breadth-First Search)는 그래프의 모든 노드를 탐색하는 알고리즘 중 하나이다.   
 BFS는 큐(Queue)를 사용하여 구현할 수 있다.
 
