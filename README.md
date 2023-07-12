@@ -1335,6 +1335,55 @@ DFS는 간단하고 직관적인 알고리즘으로 경로 찾기 문제에 유�
 
 ### 구현
 ```c#
+public static class DFS<T>
+{
+  private static List<Node<T>> Visited { get; set; }
+  // ...
+}
+```
+DFS 클래스를 작성한다.  
+방문한 노드들을 리스트에 저장한다.
+
+```c#
+// ...
+public static void Search(Node<T> start)
+{
+  Visited = new List<Node<T>>();
+
+  VisitNode(start);
+}
+// ...
+```
+외보 호출용 탐색 메서드를 작성한다.   
+방문한 노드를 저정할 변수를 초기화하고, 시작 노드부터 차례로 방문한다.
+
+```c#
+// ...
+private static void VisitNode(Node<T> node)
+{
+  Visited.Add(node);
+
+  Console.Write(node.Data + " ");
+
+  foreach (Node<T> item in node.Neighbors)
+  {
+    if (!Visited.Contains(item))
+    {
+      VisitNode(item);
+    }
+  }
+}
+// ...
+```
+노드 방문 메서드를 작성한다.  
+방문한 노드 리스트에 현재 노드를 추가하고 현재 노드의 값을 출력한다.  
+현재 노드의 이웃 노드 중에 아직 방문한 노드가 없을 경우 해당 노드를 방문한다.
+
+[파일](/sample_code/DFS.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -1376,6 +1425,7 @@ public static class DFS<T>
   }
 }
 ```
+</details>
 
 # 2.1.2. BFS
 ![BFS](/img/DFS_BFS.gif)
