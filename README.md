@@ -1471,6 +1471,43 @@ BFS는 최단 경로를 찾는 문제에 유용하며, 그래프의 구조를 �
 [그래프 구현 코드](https://github.com/corn1200/Data-structure-docs/blob/main/sample_code/Graph.cs)
 
 ```c#
+public static class BFS<T>
+{
+  // ...
+}
+```
+BFS 클래스를 작성한다.  
+
+```c#
+public static void Search(Node<T> start)
+{
+  Queue<Node<T>> queue = new Queue<Node<T>>();
+  queue.Enqueue(start);
+
+  while (queue.Count > 0)
+  {
+    Node<T> current = queue.Dequeue();
+    Console.Write(current.Data + " ");
+
+    foreach (Node<T> item in current.Neighbors)
+    {
+      queue.Enqueue(item);
+    }
+  }
+}
+```
+BFS 탐색 메서드를 작성한다.   
+방문할 노드를 저장하는 큐를 선언하고 큐에 시작 노드를 삽입한다.  
+방문할 노드가 없을 때까지 아래 동작을 반복한다.
+1. 큐에서 노드를 제거하고 변수에 저장한다.
+2. 방문한 노드를 출력한다.
+3. 방문한 노드의 이웃 노드들을 전부 큐에 삽입한다.
+
+[파일](/sample_code/BFS.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -1503,6 +1540,7 @@ public static class BFS<T>
   }
 }
 ```
+</details>
 
 # 2.2. Informed 전략
 Informed 전략은 문제를 정의하는데에 필요한 정보 외에 추가적인 정보를 활용하여 탐색을 수행한다.  
