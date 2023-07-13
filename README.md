@@ -1334,6 +1334,8 @@ DFS는 그래프의 모든 노드를 방문하는데 사용될 수 있다.
 DFS는 간단하고 직관적인 알고리즘으로 경로 찾기 문제에 유용하게 사용될 수 있지만, 그래프의 특성과 문제의 요구에 따라 적합한 탐색 알고리즘을 선택해야 한다.
 
 ### 구현
+[그래프 구현 코드](https://github.com/corn1200/Data-structure-docs/blob/main/sample_code/Graph.cs)
+
 ```c#
 public static class DFS<T>
 {
@@ -1464,6 +1466,34 @@ BFS는 그래프의 모든 노드를 방문하는데 사용될 수 있으며, �
 
 BFS는 최단 경로를 찾는 문제에 유용하며, 그래프의 구조를 분석하는데에도 유리한 알고리즘이다.   
 하지만 메모리 요구량과 시간복잡도를 고려해야 한다는 점을 명심해야 한다.
+
+### 구현
+[그래프 구현 코드](https://github.com/corn1200/Data-structure-docs/blob/main/sample_code/Graph.cs)
+
+```c#
+using System;
+using System.Collections;
+
+public static class BFS<T>
+{
+  public static void Search(Node<T> start)
+  {
+    Queue<Node<T>> queue = new Queue<Node<T>>();
+    queue.Enqueue(start);
+
+    while (queue.Count > 0)
+    {
+      Node<T> current = queue.Dequeue();
+      Console.Write(current.Data + " ");
+
+      foreach (Node<T> item in current.Neighbors)
+      {
+        queue.Enqueue(item);
+      }
+    }
+  }
+}
+```
 
 # 2.2. Informed 전략
 Informed 전략은 문제를 정의하는데에 필요한 정보 외에 추가적인 정보를 활용하여 탐색을 수행한다.  
