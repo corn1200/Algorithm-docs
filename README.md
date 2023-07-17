@@ -1596,6 +1596,117 @@ A 라우터의 목표는 F까지의 최단 거리 계산이며, 수단으로는 
 
 목적지가 F였으므로, A->D->C->F가 최단 경로이며, 거리는 25로 결정된다.
 
+### 구현
+```c#
+using System;
+using System.Collections;
+
+class Graph
+{
+  private int V;
+  private List<Node>[] adj;
+
+  class Node
+  {
+    public int Vertex;
+    public int Weight;
+
+    public Node(int vertex, int weight)
+    {
+      Vertex = vertex;
+      Weight = weight;
+    }
+  }
+
+  public Graph(int v)
+  {
+    V = v;
+    adj = new List<Node>[V];
+    for (int i = 0; i < V; i++)
+    {
+      adj[i] = new List<Node>();
+    }
+  }
+
+  public void AddEdge(int v, int w, int weight)
+  {
+    adj[v].Add(new Node(w, weight));
+    adj[w].Add(new Node(v, weight));
+  }
+
+  public void Dijkstra(int source)
+  {
+    int[] dist = new int[V];
+    bool[] visited = new bool[V];
+    int[] prev = new int[V];
+
+    for (int i = 0; i < V; i++)
+    {
+      dist[i] = int.MaxValue;
+      visited[i] = false;
+      prev[i] = -1;
+    }
+
+    dist[source] = 0;
+
+    for (int count = 0; count < V; count++)
+    {
+      int u = MinimumDistance(dist, visited);
+
+      visited[u] = true;
+
+      foreach (Node node in adj[u])
+      {
+        int v = node.Vertex;
+        int weight = node.Weight;
+
+        if (!visited[v] && dist[u] != int.MaxValue && dist[u] + weight < dist[v])
+        {
+          dist[v] = dist[u] + weight;
+          prev[v] = u;
+        }
+      }
+    }
+
+    Console.WriteLine("Vertex\tDistance\tPath");
+    for (int i = 0; i < V; i++)
+    {
+      Console.Write(i + "\t" + dist[i] + "\t\t");
+      PrintPath(prev, i);
+      Console.WriteLine();
+    }
+  }
+
+  private int MinimumDistance(int[] dist, bool[] visisted)
+  {
+    int min = int.MaxValue;
+    int minIndex = -1;
+
+    for (int v = 0; v < V; v++)
+    {
+      if (!visisted[v] && dist[v] <= min)
+      {
+        min = dist[v];
+        minIndex = v;
+      }
+    }
+
+    return minIndex;
+  }
+
+  private void PrintPath(int[] prev, int v)
+  {
+    if (v == -1)
+    {
+      return;
+    }
+
+    PrintPath(prev, prev[v]);
+    Console.Write(v + " ");
+  }
+}
+```
+
 # 2.4. A* 알고리즘
 A* 알고리즘은 그래프 탐색과 경로 탐색에서 사용되는 효율적인 탐색 알고리즘이다.  
 A* 알고리즘은 다익스트라 알고리즘을 기반으로 하며, 휴리스틱(Heuristic) 함수를 추가하여 최적의 경로를 찾는다.
