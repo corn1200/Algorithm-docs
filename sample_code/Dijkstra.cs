@@ -1,107 +1,89 @@
 using System;
 using System.Collections;
 
-class Graph
+public static class Dijkstra<T>
 {
-  private int V;
-  private List<Node>[] adj;
-
-  class Node
+  private class TargetNode<T> : IComparable<TargetNode<T>>
   {
-    public int Vertex;
-    public int Weight;
+    private Node<T> Target { get; set; }
+    private int Cost { get; set; }
 
-    public Node(int vertex, int weight)
+    public TargetNode(Node<T> target, int cost)
     {
-      Vertex = vertex;
-      Weight = weight;
-    }
-  }
-
-  public Graph(int v)
-  {
-    V = v;
-    adj = new List<Node>[V];
-    for (int i = 0; i < V; i++)
-    {
-      adj[i] = new List<Node>();
-    }
-  }
-
-  public void AddEdge(int v, int w, int weight)
-  {
-    adj[v].Add(new Node(w, weight));
-    adj[w].Add(new Node(v, weight));
-  }
-
-  public void Dijkstra(int source)
-  {
-    int[] dist = new int[V];
-    bool[] visited = new bool[V];
-    int[] prev = new int[V];
-
-    for (int i = 0; i < V; i++)
-    {
-      dist[i] = int.MaxValue;
-      visited[i] = false;
-      prev[i] = -1;
+      Target = target;
+      Cost = cost;
     }
 
-    dist[source] = 0;
+    public Node<T> GetTarget() { return Target; }
 
-    for (int count = 0; count < V; count++)
+    public int CompareTo(TargetNode<T> other)
     {
-      int u = MinimumDistance(dist, visited);
-
-      visited[u] = true;
-
-      foreach (Node node in adj[u])
+      if (other == null)
       {
-        int v = node.Vertex;
-        int weight = node.Weight;
+        return 1;
+      }
 
-        if (!visited[v] && dist[u] != int.MaxValue && dist[u] + weight < dist[v])
+      return Cost.CompareTo(other.Cost);
+    }
+  }
+
+  private static HashSet<Node<T>> NonVisitedNode { get; set; }
+  private static HashSet<Node<T>> VisitedNode { get; set; }
+  private static MinHeap<TargetNode<T>> PriorityQueue { get; set; }
+  private static Dictionary<T, int> Distance { get; set; }
+
+  public static void Execute(Graph<T> graph, Node<T> start)
+  {
+    NonVisitedNode = new HashSet<Node<T>>(graph.GetNodeList());
+    VisitedNode = new HashSet<Node<T>>();
+    PriorityQueue = new MinHeap<TargetNode<T>>();
+    Distance = new Dictionary<T, int>();
+
+    foreach (var item in NonVisitedNode)
+    {
+      Distance.Add(item.Data, int.MaxValue);
+    }
+    Distance[start.Data] = 0;
+
+    Node<T> nextVisitNode = start;
+    while (NonVisitedNode.Count > 0)
+    {
+      if (VisitedNode.Contains(nextVisitNode))
+      {
+        nextVisitNode = PriorityQueue.Remove().GetTarget();
+        continue;
+      }
+      VisitedNode.Add(nextVisitNode);
+      NonVisitedNode.Remove(nextVisitNode);
+
+      int i = 0;
+      foreach (var item in nextVisitNode.Neighbors)
+      {
+        int newDistant = Distance[nextVisitNode.Data] + nextVisitNode.Weights[i];
+        if (Distance[item.Data] > newDistant)
         {
-          dist[v] = dist[u] + weight;
-          prev[v] = u;
+          Distance[item.Data] = newDistant;
         }
+
+        if (!VisitedNode.Contains(item))
+        {
+          PriorityQueue.Add(new TargetNode<T>(item, Distance[item.Data]));
+        }
+        i++;
       }
-    }
-
-    Console.WriteLine("Vertex\tDistance\tPath");
-    for (int i = 0; i < V; i++)
-    {
-      Console.Write(i + "\t" + dist[i] + "\t\t");
-      PrintPath(prev, i);
-      Console.WriteLine();
-    }
-  }
-
-  private int MinimumDistance(int[] dist, bool[] visisted)
-  {
-    int min = int.MaxValue;
-    int minIndex = -1;
-
-    for (int v = 0; v < V; v++)
-    {
-      if (!visisted[v] && dist[v] <= min)
+      try
       {
-        min = dist[v];
-        minIndex = v;
+        nextVisitNode = PriorityQueue.Remove().GetTarget();
+      }
+      catch
+      {
+        continue;
       }
     }
 
-    return minIndex;
-  }
-
-  private void PrintPath(int[] prev, int v)
-  {
-    if (v == -1)
+    foreach (var item in Distance)
     {
-      return;
+      Console.WriteLine($"{item.Key}: {item.Value}");
     }
-
-    PrintPath(prev, prev[v]);
-    Console.Write(v + " ");
   }
 }
