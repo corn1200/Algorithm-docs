@@ -116,19 +116,25 @@ public static class Dijkstra<T>
       }
     }
 
+    // 노드 별 경로 저장
+    Dictionary<T, string> pathMemo = new Dictionary<T, string>();
     // 시작 노드부터 각 노드까지의 최단 거리와 경로 표출
     foreach (var item in Distance)
     {
-      Console.Write($"{item.Key} -> Distance: {item.Value}, Path: {NodePath(item.Key)}");
-      Console.WriteLine();
+      Console.WriteLine($"{item.Key} -> Distance: {item.Value}, " +
+          $"Path: {NodePath(pathMemo, item.Key)}");
     }
   }
 
   // 목표 노드까지의 경로 표출 메서드
-  private static string NodePath(T thisNode)
+  private static string NodePath(Dictionary<T, string> pathMemo, T thisNode)
   {
-    // 경로 저장 스택
+    // 경로 저장 스택, 방문 노드 집합
     Stack<T> path = new Stack<T>();
+    HashSet<T> visited = new HashSet<T>();
+
+    // 결과 문자열
+    string result = "";
 
     // 경로 상의 이전 노드
     T beforeNode = thisNode;
@@ -136,20 +142,28 @@ public static class Dijkstra<T>
     // 이전 노드가 없을 때까지 반복
     while (beforeNode != null)
     {
-      // 경로에 이전 노드 저장
+      // 이전 노드의 경로가 이미 있을 경우 결과값에 경로 저장하고 반복 종료
+      // 혹은 이전 노드가 이미 방문한 적 있다면 반복 종료
+      if (pathMemo.TryGetValue(beforeNode, out result) ||
+          visited.Contains(beforeNode))
+      {
+        break;
+      }
+      // 경로에 이전 노드 저장, 방문 노드 집합에 이전 노드 저장
       path.Push(beforeNode);
+      visited.Add(beforeNode);
       // 이전 노드를 이전 노드의 이전 노드로 변경
       beforeNode = BeforeNode[beforeNode];
     }
-
-    // 결과 문자열
-    string result = "";
 
     // 스택에 저장한 경로를 결과값에 저장
     foreach (var item in path)
     {
       result += $"{item} ";
     }
+
+    // 해당 노드의 최단 경로 저장
+    pathMemo[thisNode] = result;
 
     // 결과값 반환
     return result;
