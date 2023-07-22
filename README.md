@@ -1609,6 +1609,176 @@ A 라우터의 목표는 F까지의 최단 거리 계산이며, 수단으로는 
 
 ### 구현
 ```c#
+public static class Dijkstra<T>
+{
+  private static HashSet<Node<T>> NonVisitedNode { get; set; }
+  private static MinHeap<TargetNode<T>> PriorityQueue { get; set; }
+  private static Dictionary<T, int> Distance { get; set; }
+  private static Dictionary<T, T> BeforeNode { get; set; }
+  // ...
+}
+```
+다익스트라 클래스를 작성한다.   
+미방문 노드 집합, 다음 방문 노드를 저장하는 우선순위 큐, 노드의 거리를 저장하는 딕셔너리, 경로 상의 이전 노드를 저장하는 딕셔너리를 필드로 가진다.  
+우선순위 큐의 타입은 [최소 힙](https://github.com/corn1200/Data-structure-docs/blob/main/sample_code/MinHeap.cs)을 사용한다.
+
+```c#
+// ...
+private class TargetNode<T> : IComparable<TargetNode<T>>
+{
+  private Node<T> Target { get; set; }
+  private int Cost { get; set; }
+
+  public TargetNode(Node<T> target, int cost)
+  {
+    Target = target;
+    Cost = cost;
+  }
+
+  public Node<T> GetTarget() { return Target; }
+
+  public int CompareTo(TargetNode<T> other)
+  {
+    if (other == null)
+    {
+      return 1;
+    }
+
+    return Cost.CompareTo(other.Cost);
+  }
+}
+// ...
+```
+우선순위 큐에 저장될 목표 노드 클래스를 작성한다.   
+목표 노드 클래스는 목표가 되는 노드와 이동 비용을 필드로 가진다.  
+우선순위 큐 내부에서 우선순위를 비교하기 위해 IComparable 인터페이스를 구현한다.   
+비교 대상이 null일 경우 비교 주체가 더 큰 것으로 판단하고, 기본적으론 이동 비용의 크기를 비교하여 판단한다.
+
+```c#
+public static void Execute(Graph<T> graph, Node<T> start)
+{
+  NonVisitedNode = new HashSet<Node<T>>(graph.GetNodeList());
+  PriorityQueue = new MinHeap<TargetNode<T>>();
+  Distance = new Dictionary<T, int>();
+  BeforeNode = new Dictionary<T, T>();
+
+  foreach (var item in NonVisitedNode)
+  {
+    Distance.Add(item.Data, int.MaxValue);
+    BeforeNode.Add(item.Data, default);
+  }
+  Distance[start.Data] = 0;
+
+  Node<T> nextVisitNode = start;
+  while (NonVisitedNode.Count > 0)
+  {
+    if (!NonVisitedNode.Contains(nextVisitNode))
+    {
+      nextVisitNode = PriorityQueue.Remove().GetTarget();
+      continue;
+    }
+    NonVisitedNode.Remove(nextVisitNode);
+
+    int i = 0;
+    foreach (var item in nextVisitNode.Neighbors)
+    {
+      int newDistant = Distance[nextVisitNode.Data] + nextVisitNode.Weights[i];
+      if (Distance[item.Data] > newDistant)
+      {
+        Distance[item.Data] = newDistant;
+        BeforeNode[item.Data] = nextVisitNode.Data;
+      }
+
+      if (NonVisitedNode.Contains(item))
+      {
+        PriorityQueue.Add(new TargetNode<T>(item, Distance[item.Data]));
+      }
+      i++;
+    }
+
+    try
+    {
+      nextVisitNode = PriorityQueue.Remove().GetTarget();
+    }
+    catch
+    {
+      continue;
+    }
+  }
+
+  Dictionary<T, string> pathMemo = new Dictionary<T, string>();
+  foreach (var item in Distance)
+  {
+    Console.WriteLine($"{item.Key} -> Distance: {item.Value}, " +
+        $"Path: {NodePath(pathMemo, item.Key)}");
+  }
+}
+```
+다익스트라 알고리즘 실행 메서드를 작성한다.   
+필드를 초기화하고 노드의 최단 거리와 이전 노드에 각각 정수 최대값과 기본값(null)을 설정한다.  
+시작 노드의 거리는 다시 0으로 설정한다.   
+다음 방문할 노드를 시작 노드로 초기화하고 모든 노드를 방문할 때까지 아래 동작을 반복한다.
+
+1. 이번에 방문할 노드가 이미 방문한 노드인 경우 다음 방문할 노드를 우선순위 큐에서 꺼내어 변경 후 다음 반복 동작으로 넘어간다.  
+2. 미방문 노드 집합에서 현재 방문한 노드를 제거하고 인접 노드 인덱스 변수를 0으로 초기화한다.
+3. 현재 방문 노드의 인접 노드를 전부 순회하면서 아래 동작을 수행한다.   
+3.1. 방문한 노드의 거리와 인접 노드의 거리를 합하여 새로운 거리 값을 생성한다.  
+3.2. 새로운 거리 값이 기존의 거리 값보다 작을 경우 인접 노드의 거리 값과 인접 노드의 거리 값을 새로운 거리 값으로 변경하고, 인접 노드의 이전 노드를 현재 방문한 노드로 변경한다.  
+3.3. 인접 노드가 미방문 노드일 경우 우선순위 큐에 다음 방문할 목표 노드로 인접 노드를 거리 값과 함께 추가한다.  
+3.4. 인접 노드 인덱스를 증가시킨다.
+4. 우선순위 큐에서 다음 방문할 노드를 꺼내어 변경한다.  
+
+노드 별 경로를 저장할 딕셔너리를 생성한다.  
+각 노드의 최단 거리 딕셔너리를 순회하며 최단 거리와 최단 경로를 표출한다.
+
+```c#
+private static string NodePath(Dictionary<T, string> pathMemo, T thisNode)
+{
+  Stack<T> path = new Stack<T>();
+  HashSet<T> visited = new HashSet<T>();
+
+  string result = "";
+
+  T beforeNode = thisNode;
+
+  while (beforeNode != null)
+  {
+    if (pathMemo.TryGetValue(beforeNode, out result) ||
+        visited.Contains(beforeNode))
+    {
+      break;
+    }
+    path.Push(beforeNode);
+    visited.Add(beforeNode);
+    beforeNode = BeforeNode[beforeNode];
+  }
+
+  foreach (var item in path)
+  {
+    result += $"{item} ";
+  }
+
+  pathMemo[thisNode] = result;
+
+  return result;
+}
+```
+시작 노드부터 현재 노드까지의 최단 경로를 반환하는 메서드를 작성한다.  
+경로를 저장할 스택과 방문 노드 집합, 결과 문자열을 선언한다.  
+이전 노드 변수를 생성하고 더 이상 이전 노드가 없을 때까지 노드를 방문하며 아래 동작을 반복한다.   
+
+1. 방문한 노드의 경로가 이미 계산되어 있을 경우 결과값에 경로를 저장하고 반복을 종료한다.   
+2. 혹은 방문한 노드가 이미 방문한 적이 있다면 반복을 종료한다.
+3. 경로, 방문 노드 집합에 방문한 노드를 추가하고 이전 노드를 다음 방문할 노드로 설정한다.
+
+스택을 순회하며 결과값에 경로를 저장한다.   
+다른 노드의 경로를 계산할 때 재사용하도록 하기 위해 현재 노드의 경로 결과값을 노드 별 경로를 저장하는 딕셔너리에 추가하고, 결과값을 반환한다.
+
+[파일](/sample_code/Dijkstra.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -1687,7 +1857,7 @@ public static class Dijkstra<T>
         nextVisitNode = PriorityQueue.Remove().GetTarget();
         continue;
       }
-      // 미방문 노드 집합에서 다음 방문할 노드를 제거
+      // 미방문 노드 집합에서 현재 방문한 노드를 제거
       NonVisitedNode.Remove(nextVisitNode);
 
       // 인접 노드의 인덱스
@@ -1737,7 +1907,7 @@ public static class Dijkstra<T>
     }
   }
 
-  // 목표 노드까지의 경로 표출 메서드
+  // 목표 노드까지의 경로 반환 메서드
   private static string NodePath(Dictionary<T, string> pathMemo, T thisNode)
   {
     // 경로 저장 스택, 방문 노드 집합
@@ -1781,6 +1951,7 @@ public static class Dijkstra<T>
   }
 }
 ```
+</details>
 
 # 2.4. A* 알고리즘
 A* 알고리즘은 그래프 탐색과 경로 탐색에서 사용되는 효율적인 탐색 알고리즘이다.  

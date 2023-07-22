@@ -76,7 +76,7 @@ public static class Dijkstra<T>
         nextVisitNode = PriorityQueue.Remove().GetTarget();
         continue;
       }
-      // 미방문 노드 집합에서 다음 방문할 노드를 제거
+      // 미방문 노드 집합에서 현재 방문한 노드를 제거
       NonVisitedNode.Remove(nextVisitNode);
 
       // 인접 노드의 인덱스
@@ -126,7 +126,7 @@ public static class Dijkstra<T>
     }
   }
 
-  // 목표 노드까지의 경로 표출 메서드
+  // 목표 노드까지의 경로 반환 메서드
   private static string NodePath(Dictionary<T, string> pathMemo, T thisNode)
   {
     // 경로 저장 스택, 방문 노드 집합
