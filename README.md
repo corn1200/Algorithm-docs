@@ -1647,9 +1647,8 @@ public static class Dijkstra<T>
     }
   }
 
-  // 아직 방문하지 않은 노드 집합과 방문한 노드 집합
+  // 아직 방문하지 않은 노드 집합
   private static HashSet<Node<T>> NonVisitedNode { get; set; }
-  private static HashSet<Node<T>> VisitedNode { get; set; }
   // 다음 번 방문 노드를 저장하는 우선순위 큐, 노드의 거리를 저장하는 딕셔너리
   private static MinHeap<TargetNode<T>> PriorityQueue { get; set; }
   private static Dictionary<T, int> Distance { get; set; }
@@ -1659,7 +1658,6 @@ public static class Dijkstra<T>
   {
     // 멤버변수 초기화
     NonVisitedNode = new HashSet<Node<T>>(graph.GetNodeList());
-    VisitedNode = new HashSet<Node<T>>();
     PriorityQueue = new MinHeap<TargetNode<T>>();
     Distance = new Dictionary<T, int>();
 
@@ -1677,14 +1675,12 @@ public static class Dijkstra<T>
     while (NonVisitedNode.Count > 0)
     {
       // 이번에 방문할 노드가 이미 방문한 노드인 경우 실행
-      if (VisitedNode.Contains(nextVisitNode))
+      if (!NonVisitedNode.Contains(nextVisitNode))
       {
         // 다음 방문할 노드를 우선순위 큐에서 꺼내어 변경 후 반복문 넘어감
         nextVisitNode = PriorityQueue.Remove().GetTarget();
         continue;
       }
-      // 방문한 노드 집합에 다음 방문할 노드를 추가
-      VisitedNode.Add(nextVisitNode);
       // 방문하지 않은 노드 집합에서 다음 방문할 노드를 제거
       NonVisitedNode.Remove(nextVisitNode);
 
@@ -1703,7 +1699,7 @@ public static class Dijkstra<T>
         }
 
         // 인접 노드가 아직 방문한 적 없는 노드일 경우 실행
-        if (!VisitedNode.Contains(item))
+        if (NonVisitedNode.Contains(item))
         {
           // 우선순위 큐에 다음 방문할 목표 노드로 추가
           PriorityQueue.Add(new TargetNode<T>(item, Distance[item.Data]));
