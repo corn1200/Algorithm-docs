@@ -36,11 +36,13 @@ public static class Dijkstra<T>
     }
   }
 
-  // 아직 방문하지 않은 노드 집합
+  // 미방문 노드 집합
   private static HashSet<Node<T>> NonVisitedNode { get; set; }
-  // 다음 번 방문 노드를 저장하는 우선순위 큐, 노드의 거리를 저장하는 딕셔너리
+  // 다음 방문할 노드를 저장하는 우선순위 큐
   private static MinHeap<TargetNode<T>> PriorityQueue { get; set; }
+  // 노드의 거리를 저장하는 딕셔너리, 경로 상의 이전 노드를 저장하는 딕셔너리
   private static Dictionary<T, int> Distance { get; set; }
+  private static Dictionary<T, T> BeforeNode { get; set; }
 
   // 다익스트라 알고리즘 실행 메서드
   public static void Execute(Graph<T> graph, Node<T> start)
@@ -49,11 +51,15 @@ public static class Dijkstra<T>
     NonVisitedNode = new HashSet<Node<T>>(graph.GetNodeList());
     PriorityQueue = new MinHeap<TargetNode<T>>();
     Distance = new Dictionary<T, int>();
+    BeforeNode = new Dictionary<T, T>();
 
-    // 모든 노드 거리를 정수 최대값으로 설정
+    // 모든 미방문 노드를 순회
     foreach (var item in NonVisitedNode)
     {
+      // 노드 거리 정수 최대값으로 설정
       Distance.Add(item.Data, int.MaxValue);
+      // 이전 노드를 기본값(null)으로 설정
+      BeforeNode.Add(item.Data, default);
     }
     // 시작 노드의 거리를 0으로 설정
     Distance[start.Data] = 0;
@@ -70,7 +76,7 @@ public static class Dijkstra<T>
         nextVisitNode = PriorityQueue.Remove().GetTarget();
         continue;
       }
-      // 방문하지 않은 노드 집합에서 다음 방문할 노드를 제거
+      // 미방문 노드 집합에서 다음 방문할 노드를 제거
       NonVisitedNode.Remove(nextVisitNode);
 
       // 인접 노드의 인덱스
@@ -85,9 +91,11 @@ public static class Dijkstra<T>
         {
           // 인접 노드의 거리 값 업데이트
           Distance[item.Data] = newDistant;
+          // 인접 노드의 이전 노드 업데이트
+          BeforeNode[item.Data] = nextVisitNode.Data;
         }
 
-        // 인접 노드가 아직 방문한 적 없는 노드일 경우 실행
+        // 인접 노드가 미방문 노드일 경우 실행
         if (NonVisitedNode.Contains(item))
         {
           // 우선순위 큐에 다음 방문할 목표 노드로 추가
@@ -108,10 +116,42 @@ public static class Dijkstra<T>
       }
     }
 
-    // 계산된 시작 노드부터 각 노드까지의 최단 거리 표출
+    // 시작 노드부터 각 노드까지의 최단 거리와 경로 표출
     foreach (var item in Distance)
     {
-      Console.WriteLine($"{item.Key}: {item.Value}");
+      Console.Write($"{item.Key} -> Distance: {item.Value}, Path: {NodePath(item.Key)}");
+      Console.WriteLine();
     }
+  }
+
+  // 목표 노드까지의 경로 표출 메서드
+  private static string NodePath(T thisNode)
+  {
+    // 경로 저장 스택
+    Stack<T> path = new Stack<T>();
+
+    // 경로 상의 이전 노드
+    T beforeNode = thisNode;
+
+    // 이전 노드가 없을 때까지 반복
+    while (beforeNode != null)
+    {
+      // 경로에 이전 노드 저장
+      path.Push(beforeNode);
+      // 이전 노드를 이전 노드의 이전 노드로 변경
+      beforeNode = BeforeNode[beforeNode];
+    }
+
+    // 결과 문자열
+    string result = "";
+
+    // 스택에 저장한 경로를 결과값에 저장
+    foreach (var item in path)
+    {
+      result += $"{item} ";
+    }
+
+    // 결과값 반환
+    return result;
   }
 }
