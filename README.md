@@ -1993,6 +1993,176 @@ A* 알고리즘은 최단 경로 문제를 효율적으로 해결할 수 있는 
 
 ### 구현
 ```c#
+public class Node
+{
+  public int X { get; set; }
+  public int Y { get; set; }
+  public int Cost { get; set; }
+  public int TotalCost { get; set; }
+  public Node Parent { get; set; }
+
+  public Node(int x, int y, int cost, int totalCost, Node parent)
+  {
+    X = x;
+    Y = y;
+    Cost = cost;
+    TotalCost = totalCost;
+    Parent = parent;
+  }
+}
+```
+노드 클래스를 작성한다.   
+X, Y 좌표와 시작 지점에서 현재 노드까지의 이동 비용, 시작 지점에서 도착 지점까지의 이동 예상 비용과 부모 노드를 필드로 가진다.
+
+```c#
+public class AStar
+{
+  private int[,] grid;
+  private int width;
+  private int height;
+
+  public AStar(int[,] grid)
+  {
+    this.grid = grid;
+    width = grid.GetLength(0);
+    height = grid.GetLength(1);
+  }
+  // ...
+}
+```
+A* 클래스를 작성한다.   
+탐색할 2차원 공간과 공간의 넓이, 높이를 필드로 가진다.  
+
+```c#
+// ...
+private int ManhattanDistance(int x1, int y1, int x2, int y2)
+{
+  return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
+}
+// ...
+```
+휴리스틱 함수를 작성한다.   
+두 좌표 사이의 x, y 거리 절대값의 합(택시거리)을 반환한다.
+
+```c#
+// ...
+public List<Node> FindPath(int startX, int startY, int targetX, int targetY)
+{
+  List<Node> openList = new List<Node>();
+  List<Node> closedList = new List<Node>();
+
+  Node startNode = new Node(startX, startY, 0,
+      ManhattanDistance(startX, startY, targetX, targetY), null);
+
+  openList.Add(startNode);
+
+  while (openList.Count > 0)
+  {
+    Node currentNode = openList[0];
+    int currentIndex = 0;
+
+    for (int i = 1; i < openList.Count; i++)
+    {
+      if (openList[i].TotalCost < currentNode.TotalCost)
+      {
+        currentNode = openList[i];
+        currentIndex = i;
+      }
+    }
+
+    openList.RemoveAt(currentIndex);
+    closedList.Add(currentNode);
+
+    if (currentNode.X == targetX && currentNode.Y == targetY)
+    {
+      List<Node> path = new List<Node>();
+      while (currentNode != null)
+      {
+        path.Add(currentNode);
+        currentNode = currentNode.Parent;
+      }
+      path.Reverse();
+
+      return path;
+    }
+
+    List<Node> neighbors = new List<Node>();
+    int[] dx = { -1, 1, 0, 0, };
+    int[] dy = { 0, 0, -1, 1 };
+
+    for (int i = 0; i < 4; i++)
+    {
+      int nx = currentNode.X + dx[i];
+      int ny = currentNode.Y + dy[i];
+
+      if (nx >= 0 && nx < width && ny >= 0 && ny < height
+          && grid[nx, ny] == 0 && !ContainsNode(closedList, nx, ny))
+      {
+        int newCost = currentNode.Cost + 1;
+        int heuristic = ManhattanDistance(nx, ny, targetX, targetY);
+        int totalCost = newCost + heuristic;
+
+        Node neighborNode = new Node(nx, ny, newCost, totalCost, currentNode);
+        neighbors.Add(neighborNode);
+      }
+    }
+
+    foreach (Node neighbor in neighbors)
+    {
+      if (ContainsNode(openList, neighbor.X, neighbor.Y))
+      {
+        Node existingNode = openList.Find(n => n.X == neighbor.X && n.Y == neighbor.Y);
+        if (neighbor.Cost < existingNode.Cost)
+        {
+          existingNode.Cost = neighbor.Cost;
+          existingNode.TotalCost = neighbor.TotalCost;
+          existingNode.Parent = neighbor.Parent;
+        }
+      }
+      else
+      {
+        openList.Add(neighbor);
+      }
+    }
+  }
+
+  return null;
+}
+// ...
+```
+경로 탐색 메서드를 작성한다.  
+방문할 노드 리스트와 이미 방문한 노드 리스트를 선언한다.  
+시작 노드를 선언 후 방문할 노드에 추가한다.
+
+방문할 노드가 없을 때까지 아래 동작을 반복한다.   
+1. 방문할 노드 중 도착지까지의 예상 비용이 가장 작은 노드를 현재 노드로 지정한다.
+2. 방문할 노드에서 현재 노드 제거, 이미 방문한 노드에 현재 노드를 추가한다.
+3. 현재 노드가 도착 지점일 경우 경로를 역추적한 후 반전하여 반환한다.
+4. 이웃 노드 리스트를 선언하고 상하좌우 좌표를 탐색한다.
+5. 현재 노드의 상하좌우가 유효한 좌표이고 아직 방문하지 않은 노드일 경우 해당 좌표까지의 이동 비용과 도착 지점까지의 이동 예상 비용을 계산한다.   
+이동 비용과 도착 지점까지 예상 비용을 더하여 총 이동 비용을 구하고 새로운 이웃 노드 객체를 생성한 후 이웃 노드 리스트에 추가한다.
+6. 이웃 노드를 순회하며 아래 동작을 반복한다.   
+6.1. 이웃 좌표에 해당하는 노드가 방문할 노드 리스트에 이미 있을 경우 더 적은 비용이 드는 내용으로 갱신한다.
+6.2. 일반적인 경우엔 방문할 노드에 이웃 노드를 추가한다.
+
+경로를 찾지 못한 경우 null을 반환한다.
+
+```c#
+// ...
+private bool ContainsNode(List<Node> nodeList, int x, int y)
+{
+  return nodeList.Exists(n => n.X == x && n.Y == y);
+}
+// ...
+```
+중복 좌표의 노드 유무 확인 메서드를 작성한다.  
+x, y 좌표에 해당하는 노드가 리스트에 있을 경우 true를 반환하고 없을 경우 false를 반환한다.
+
+[파일](/sample_code/Astar.cs)
+<details>
+<summary>C# 예제 코드</summary>
+
+```c#
 using System;
 using System.Collections;
 
@@ -2004,7 +2174,7 @@ public class Node
   public int Y { get; set; }
   // 시작 지점에서 현재 좌표까지의 이동 비용
   public int Cost { get; set; }
-  // 현재 좌표에서 도착 지점까지의 이동 예상 비용
+  // 시작 지점에서 도착 지점까지의 이동 예상 비용
   public int TotalCost { get; set; }
   // 부모 노드
   public Node Parent { get; set; }
@@ -2116,7 +2286,7 @@ public class AStar
         int ny = currentNode.Y + dy[i];
 
         // 이웃 노드가 범위 내에 있고 벽이 아니며
-        // 이미 확인하지 않은 노드인 경우 실행
+        // 아직 방문하지 않은 노드인 경우 실행
         if (nx >= 0 && nx < width && ny >= 0 && ny < height
             && grid[nx, ny] == 0 && !ContainsNode(closedList, nx, ny))
         {
@@ -2170,6 +2340,7 @@ public class AStar
   }
 }
 ```
+</details>
 
 # 3. 패러다임
 알고리즘 패러다임은 프로그래밍에서 자주 사용되는 일련의 알고리즘 설계 방법을 의미한다.  

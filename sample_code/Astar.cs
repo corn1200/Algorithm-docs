@@ -9,7 +9,7 @@ public class Node
   public int Y { get; set; }
   // 시작 지점에서 현재 좌표까지의 이동 비용
   public int Cost { get; set; }
-  // 현재 좌표에서 도착 지점까지의 이동 예상 비용
+  // 시작 지점에서 도착 지점까지의 이동 예상 비용
   public int TotalCost { get; set; }
   // 부모 노드
   public Node Parent { get; set; }
@@ -121,7 +121,7 @@ public class AStar
         int ny = currentNode.Y + dy[i];
 
         // 이웃 노드가 범위 내에 있고 벽이 아니며
-        // 이미 확인하지 않은 노드인 경우 실행
+        // 아직 방문하지 않은 노드인 경우 실행
         if (nx >= 0 && nx < width && ny >= 0 && ny < height
             && grid[nx, ny] == 0 && !ContainsNode(closedList, nx, ny))
         {
